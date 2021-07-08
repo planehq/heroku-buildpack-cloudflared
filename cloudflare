@@ -3,7 +3,15 @@
 if [ -z $CLOUDFLARED_TUNNEL ]; then
   exec "$@"
 else
-  cloudflared tunnel --no-autoupdate run $CLOUDFLARED_TUNNEL &
-  "$@" &
+  if [ -z $CLOUDFLARED_URL ]; then
+    cloudflared tunnel --no-autoupdate run $CLOUDFLARED_TUNNEL &
+    "$@" &
+  else
+    # Interpolate CLOUDFLARED_URL to include any dynamic variables (e.g. $PORT)
+    eval CLOUDFLARED_URL=$CLOUDFLARED_URL
+
+    cloudflared tunnel --no-autoupdate run --url $CLOUDFLARED_URL $CLOUDFLARED_TUNNEL &
+    "$@" &
+  fi
   wait -n
 fi

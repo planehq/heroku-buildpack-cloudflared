@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -f "$1/.cloudflared/config.yml" ]; then
+if [ -d "$1/.cloudflared" ]; then
   echo "Cloudflare Agent"
   exit 0
 else
