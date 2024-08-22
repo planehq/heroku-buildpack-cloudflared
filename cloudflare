@@ -4,7 +4,7 @@ if [ -z $CLOUDFLARED_TUNNEL ]; then
   exec "$@"
 else
   if [ -z $CLOUDFLARED_URL ]; then
-    cloudflared tunnel --no-autoupdate run $CLOUDFLARED_TUNNEL &
+    cloudflared tunnel --loglevel debug --no-autoupdate run $CLOUDFLARED_TUNNEL &
     "$@" &
   else
     # Interpolate CLOUDFLARED_URL to include any dynamic variables (e.g. $PORT)

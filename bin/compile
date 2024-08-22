@@ -1,11 +1,23 @@
-#!/bin/sh
+#!/bin/bash
+
+set -euf -o pipefail
+
+# Indent in Heroku push style
+# https://devcenter.heroku.com/articles/buildpack-api#bin-compile-example
+indent() {
+  sed -e 's/^/       /'
+}
+
+header() {
+   sed -e 's/^/-----> /'
+ }
 
 # Parse and derive params
 BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
 
-echo "-----> Installing cloudflared..."
+echo "Installing cloudflared..." | header
 
 mkdir -p $BUILD_DIR/vendor/cloudflared/bin
 mkdir -p $BUILD_DIR/bin
@@ -13,24 +25,21 @@ mkdir -p $BUILD_DIR/bin
 cp ./cloudflared $BUILD_DIR/vendor/cloudflared/bin/cloudflared
 cp ./cloudflare $BUILD_DIR/vendor/cloudflared/bin/cloudflare
 
-chmod +x $BUILD_DIR/vendor/cloudflared/bin/cloudflared
-chmod +x $BUILD_DIR/vendor/cloudflared/bin/cloudflare
-
 ln -s "../vendor/cloudflared/bin/cloudflared" $BUILD_DIR/bin/cloudflared
 ln -s "../vendor/cloudflared/bin/cloudflare" $BUILD_DIR/bin/cloudflare
 
-echo "       Done"
+echo "Done" | indent
 
 # Copy tunnel credentials
 if [ -f $ENV_DIR/CLOUDFLARED_TUNNEL ]; then
   export "CLOUDFLARED_TUNNEL=$(cat $ENV_DIR/CLOUDFLARED_TUNNEL)"
 
   if [ -f $ENV_DIR/CLOUDFLARED_CREDENTIALS ]; then
-    echo "-----> Copying tunnel credentials..."
+    echo "Copying tunnel credentials..." | header
 
     mkdir -p $BUILD_DIR/.cloudflared
     cp $ENV_DIR/CLOUDFLARED_CREDENTIALS $BUILD_DIR/.cloudflared/$CLOUDFLARED_TUNNEL.json
 
-    echo "       Done"
+    echo "Done" | indent
   fi
 fi
