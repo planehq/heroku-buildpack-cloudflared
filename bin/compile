@@ -22,9 +22,20 @@ echo "Installing cloudflared..." | header
 mkdir -p $BUILD_DIR/vendor/cloudflared/bin
 mkdir -p $BUILD_DIR/bin
 
-cp ./cloudflared $BUILD_DIR/vendor/cloudflared/bin/cloudflared
+echo "Downloading cloudflared binary..." | header
+curl -sSL \
+  https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
+  -o "$BUILD_DIR/vendor/cloudflared/bin/cloudflared" \
+  | indent
+
+echo "Copying cloudflare shim..." | header
 cp ./cloudflare $BUILD_DIR/vendor/cloudflared/bin/cloudflare
 
+echo "Fixing permissions..." | header
+chmod +x "$BUILD_DIR/vendor/cloudflared/bin/cloudflared"
+chmod +x "$BUILD_DIR/vendor/cloudflared/bin/cloudflare"
+
+echo "Linking..." | header
 ln -s "../vendor/cloudflared/bin/cloudflared" $BUILD_DIR/bin/cloudflared
 ln -s "../vendor/cloudflared/bin/cloudflare" $BUILD_DIR/bin/cloudflare
 
